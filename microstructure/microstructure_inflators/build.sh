@@ -13,7 +13,7 @@ install_boost() {
     if [ ! -d "$BOOST_DIR" ]; then
         echo "Downloading Boost $BOOST_VERSION..."
         cd "$HOME/Downloads"
-        wget "https://boostorg.jfrog.io/artifactory/main/release/$BOOST_VERSION/source/boost_${BOOST_VERSION//./_}.tar.gz"
+        wget "https://sourceforge.net/projects/boost/files/boost/$BOOST_VERSION/boost_${BOOST_VERSION//./_}.tar.gz/download" -O "boost_${BOOST_VERSION//./_}.tar.gz"
         tar -xzf "boost_${BOOST_VERSION//./_}.tar.gz"
         rm "boost_${BOOST_VERSION//./_}.tar.gz"
     fi
