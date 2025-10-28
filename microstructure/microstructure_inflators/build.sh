@@ -2,6 +2,18 @@
 # Simple build script for microstructure_inflators
 # This script builds the essential tools needed for eFlesh
 set -e  # Exit on any error
+
+JOBS=12
+for arg in "$@"; do
+  case $arg in
+    cpu_nodes=*) JOBS="${arg#*=}";;
+  esac
+done
+[[ "$JOBS" =~ ^[0-9]+$ ]] || JOBS=8
+[ "$JOBS" -lt 1 ] && JOBS=1
+J="-j$JOBS"
+
+echo "Using $JOBS CPU nodes for building."
 echo "Building microstructure_inflators..."
 install_boost() {
     local BOOST_VERSION="1.83.0"
@@ -38,7 +50,7 @@ install_boost() {
              --with-serialization \
              --with-program_options \
              --with-test \
-             -j$(nproc) \
+             $J \
              install
         
         echo "Boost installed to: $BOOST_INSTALL_DIR"
@@ -151,7 +163,7 @@ install_tbb() {
               -DCMAKE_CXX_FLAGS="-Wno-error=array-bounds -Wno-array-bounds" \
               ..
         
-        make -j$(nproc)
+        make $J
         make install
         
         echo "TBB installed to: $TBB_INSTALL_DIR"
@@ -161,10 +173,18 @@ install_tbb() {
     
     export TBB_ROOT="$TBB_INSTALL_DIR"
 }
+
+ORIGINAL_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 install_system_deps
 install_boost
 install_tbb
-cd "$(dirname "$0")"
+
+echo "ORIGINAL_DIR is: $ORIGINAL_DIR"
+cd "$ORIGINAL_DIR"
+echo "Current directory after cd: $(pwd)"
+echo "TBB_ROOT: $TBB_ROOT"
+echo "BOOST_ROOT: $BOOST_ROOT"
 echo "Fixing CMake version requirements..."
 find . -name "CMakeLists.txt" -exec sed -i 's/cmake_minimum_required(VERSION 3\.1)/cmake_minimum_required(VERSION 3.10)/g' {} \;
 find . -name "CMakeLists.txt" -exec sed -i 's/cmake_minimum_required(VERSION 3\.2)/cmake_minimum_required(VERSION 3.10)/g' {} \;
@@ -172,6 +192,7 @@ find . -name "CMakeLists.txt" -exec sed -i 's/cmake_minimum_required(VERSION 3\.
 find . -name "CMakeLists.txt" -exec sed -i 's/cmake_minimum_required(VERSION 3\.4)/cmake_minimum_required(VERSION 3.10)/g' {} \;
 mkdir -p build
 cd build
+echo "Building in directory: $(pwd)"
 echo "Configuring with CMake..."
 cmake -DCMAKE_BUILD_TYPE=release \
       -DCMAKE_POLICY_VERSION_MINIMUM=3.1 \
@@ -180,14 +201,14 @@ cmake -DCMAKE_BUILD_TYPE=release \
       -DBoost_NO_SYSTEM_PATHS=ON \
       -DBOOST_ROOT="$BOOST_ROOT" \
       -DTBB_ROOT="$TBB_ROOT" \
-      -DTBB_DIR="$TBB_ROOT/lib/cmake/TBB" \
       -DMICRO_WITH_TBB=ON \
       -DCMAKE_PREFIX_PATH="$TBB_ROOT" \
       ..
+sleep 2
 echo "Building essential tools..."
-make -j$(nproc) stitch_cells_cli
-make -j$(nproc) cut_cells_cli  
-make -j$(nproc) stack_cells
+make $J stitch_cells_cli
+make $J cut_cells_cli  
+make $J stack_cells
 echo "Build completed successfully!"
 echo "Built tools:"
 echo "  - stitch_cells_cli"
