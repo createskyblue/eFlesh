@@ -1,3 +1,5 @@
+> **[中文技术分析报告](./eFlesh技术分析报告.md)** - 包含系统架构、工作原理、数据收集方法、训练框架、MCU部署方案等详细技术分析
+
 <h1 align="center" style="font-size: 2.0em; font-weight: bold; margin-bottom: 0; border: none; border-bottom: none;">eFlesh: Highly customizable Magnetic Touch Sensing using Cut-Cell Miscrostructures</h1>
 
 ##### <p align="center"> [Venkatesh Pattabiraman](https://venkyp.com), [Zizhou Huang](https://huangzizhou.github.io/), [Daniele Panozzo](https://cims.nyu.edu/gcl/daniele.html), [Denis Zorin](https://cims.nyu.edu/gcl/denis.html), [Lerrel Pinto](https://www.lerrelpinto.com/) and [Raunaq Bhirangi](https://raunaqbhirangi.github.io/)</p>
